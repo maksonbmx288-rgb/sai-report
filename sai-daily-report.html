@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAI — Ежедневный отчёт</title>
+  <style>
+    :root {
+      --bg: #0b0b0f;
+      --card: #15151c;
+      --border: #2a2a35;
+      --text: #e4e4e7;
+      --muted: #a1a1aa;
+      --accent: #8b5cf6;
+      --accent-hover: #7c3aed;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --input-bg: #0f0f14;
+      --norm: #a78bfa;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 16px;
+      line-height: 1.5;
+    }
+
+    .container { max-width: 520px; margin: 0 auto; }
+
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    header p { color: var(--muted); font-size: 0.9rem; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .form-group { margin-bottom: 16px; }
+    .form-group:last-child { margin-bottom: 0; }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: var(--muted);
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 13px;
+      color: var(--text);
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    input[type="number"] { -moz-appearance: textfield; }
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+    textarea {
+      min-height: 64px;
+      resize: vertical;
+      font-size: 0.92rem;
+    }
+
+    .activity-block {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .activity-block:last-child { margin-bottom: 0; }
+
+    .activity-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .activity-title {
+      font-weight: 600;
+      font-size: 0.92rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .activity-count {
+      width: 72px;
+      flex-shrink: 0;
+    }
+
+    .activity-count input {
+      text-align: center;
+      padding: 7px 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .norm-badge {
+      font-size: 0.75rem;
+      color: var(--norm);
+      font-weight: 500;
+      margin-left: 4px;
+    }
+
+    .norms-panel {
+      background: linear-gradient(135deg, #1e1b4b 0%, #2e1065 100%);
+      border: 1px solid #5b21b6;
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+      font-size: 0.85rem;
+    }
+
+    .norms-panel h3 {
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+      color: #c4b5fd;
+    }
+
+    .norms-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px 12px;
+    }
+
+    .norm-item {
+      display: flex;
+      justify-content: space-between;
+      color: #ddd6fe;
+    }
+
+    .norm-item span:last-child {
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .norms-empty {
+      color: #a78bfa;
+      font-style: italic;
+    }
+
+    .points-box {
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+      border: 1px solid #4c1d95;
+      border-radius: 14px;
+      padding: 16px;
+      text-align: center;
+      margin-bottom: 18px;
+    }
+
+    .points-box .label {
+      font-size: 0.82rem;
+      color: #c4b5fd;
+      margin-bottom: 2px;
+    }
+
+    .points-box .value {
+      font-size: 2.3rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .points-breakdown {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 8px;
+      font-size: 0.78rem;
+      color: #a78bfa;
+      flex-wrap: wrap;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    button[type="submit"]:hover { background: var(--accent-hover); }
+    button[type="submit"]:active { transform: scale(0.98); }
+    button[type="submit"]:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .status {
+      text-align: center;
+      margin-top: 14px;
+      font-size: 0.95rem;
+      min-height: 22px;
+    }
+    .status.success { color: var(--success); }
+    .status.error { color: var(--danger); }
+
+    .hint {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>SAI — Ежедневный отчёт</h1>
+      <p>Заполни и отправь в Discord</p>
+    </header>
+
+    <form id="reportForm">
+      <div class="card">
+        <div class="form-group">
+          <label for="nickname">Ник / Discord</label>
+          <input type="text" id="nickname" name="nickname" placeholder="Например: Bell" required>
+        </div>
+
+        <div class="form-group">
+          <label for="rank">Ранг</label>
+          <select id="rank" name="rank" required>
+            <option value="" disabled selected>Выбери ранг</option>
+            <option value="Instructor">Instructor (9)</option>
+            <option value="DepHead">Dep. Head / Head (10)</option>
+            <option value="Curator">Curator (11)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="norms-panel" id="normsPanel">
+        <h3>Нормы на сегодня</h3>
+        <div id="normsContent" class="norms-empty">Сначала выбери ранг</div>
+      </div>
+
+      <div class="card">
+        <div class="activity-block">
+          <div class="activity-header">
+            <div class="activity-title">📄 Отчёты на повышение <span class="norm-badge" id="normReports"></span></div>
+            <div class="activity-count">
+              <input type="number" id="reports" min="0" value="0" required>
+            </div>
+          </div>
+          <textarea id="reportsLinks" placeholder="Ссылки на скрины"></textarea>
+        </div>
+
+        <div class="activity-block">
+          <div class="activity-header">
+            <div class="activity-title">📰 Гос. волны (GNews) <span class="norm-badge" id="normGnews"></span></div>
+            <div class="activity-count">
+              <input type="number" id="gnews" min="0" value="0" required>
+            </div>
+          </div>
+          <textarea id="gnewsLinks" placeholder="Ссылки на скрины"></textarea>
+        </div>
+
+        <div class="activity-block">
+          <div class="activity-header">
+            <div class="activity-title">🤝 Приглашения <span class="norm-badge" id="normInvites"></span></div>
+            <div class="activity-count">
+              <input type="number" id="invites" min="0" value="0" required>
+            </div>
+          </div>
+          <textarea id="invitesLinks" placeholder="Ссылки на скрины"></textarea>
+        </div>
+
+        <div class="activity-block">
+          <div class="activity-header">
+            <div class="activity-title">🚪 Увольнения <span class="norm-badge" id="normDismissals"></span></div>
+            <div class="activity-count">
+              <input type="number" id="dismissals" min="0" value="0" required>
+            </div>
+          </div>
+          <textarea id="dismissalsLinks" placeholder="Ссылки на скрины"></textarea>
+        </div>
+
+        <div class="activity-block">
+          <div class="activity-header">
+            <div class="activity-title">🪪 Выдача лицензий <span class="norm-badge" id="normLicenses"></span></div>
+            <div class="activity-count">
+              <input type="number" id="licenses" min="0" value="0" required>
+            </div>
+          </div>
+          <textarea id="licensesLinks" placeholder="Ссылки на скрины"></textarea>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="form-group">
+          <label for="notes">Заметки (необязательно)</label>
+          <textarea id="notes" placeholder="Что-то важное..."></textarea>
+        </div>
+      </div>
+
+      <div class="points-box">
+        <div class="label">Итого баллов</div>
+        <div class="value" id="totalPoints">0</div>
+        <div class="points-breakdown" id="pointsBreakdown"></div>
+      </div>
+
+      <button type="submit" id="submitBtn">Отправить отчёт</button>
+      <div class="status" id="status"></div>
+    </form>
+
+    <footer>SAI Daily Report • Discord Webhook</footer>
+  </div>
+
+  <script>
+    const WEBHOOK_URL = "https://discord.com/api/webhooks/1549129788114083983/cSUXLb2TcYEE0hxS4v4RXiOZE_QoV4KZbpMKmdEForIg439wTwQWQKNCU-AUFX9ZY4vc";
+
+    const POINTS = {
+      reports: 5,
+      gnews: 15,
+      invites: 10,
+      dismissals: 8,
+      licenses: 8
+    };
+
+    const NORMS = {
+      Instructor: {
+        reports: 5,
+        gnews: 6,
+        invites: 10,
+        dismissals: 5,
+        licenses: 6
+      },
+      DepHead: {
+        reports: 10,
+        gnews: 9,
+        invites: 15,
+        dismissals: 8,
+        licenses: 8
+      },
+      Curator: {
+        reports: 15,
+        gnews: 12,
+        invites: 20,
+        dismissals: 10,
+        licenses: 10
+      }
+    };
+
+    const RANK_NAMES = {
+      Instructor: "Instructor (9)",
+      DepHead: "Dep. Head / Head (10)",
+      Curator: "Curator (11)"
+    };
+
+    function updateNorms() {
+      const rank = document.getElementById('rank').value;
+      const content = document.getElementById('normsContent');
+
+      if (!rank || !NORMS[rank]) {
+        content.innerHTML = '<div class="norms-empty">Сначала выбери ранг</div>';
+        content.className = 'norms-empty';
+        ['Reports','Gnews','Invites','Dismissals','Licenses'].forEach(k => {
+          document.getElementById('norm' + k).textContent = '';
+        });
+        return;
+      }
+
+      const n = NORMS[rank];
+      content.className = 'norms-grid';
+      content.innerHTML = `
+        <div class="norm-item"><span>📄 Отчёты</span><span>${n.reports}</span></div>
+        <div class="norm-item"><span>📰 Гос. волны</span><span>${n.gnews}</span></div>
+        <div class="norm-item"><span>🤝 Приглашения</span><span>${n.invites}</span></div>
+        <div class="norm-item"><span>🚪 Увольнения</span><span>${n.dismissals}</span></div>
+        <div class="norm-item"><span>🪪 Лицензии</span><span>${n.licenses}</span></div>
+      `;
+
+      document.getElementById('normReports').textContent = `норма ${n.reports}`;
+      document.getElementById('normGnews').textContent = `норма ${n.gnews}`;
+      document.getElementById('normInvites').textContent = `норма ${n.invites}`;
+      document.getElementById('normDismissals').textContent = `норма ${n.dismissals}`;
+      document.getElementById('normLicenses').textContent = `норма ${n.licenses}`;
+    }
+
+    function calculatePoints() {
+      const reports = parseInt(document.getElementById('reports').value) || 0;
+      const gnews = parseInt(document.getElementById('gnews').value) || 0;
+      const invites = parseInt(document.getElementById('invites').value) || 0;
+      const dismissals = parseInt(document.getElementById('dismissals').value) || 0;
+      const licenses = parseInt(document.getElementById('licenses').value) || 0;
+
+      const pReports = reports * POINTS.reports;
+      const pGnews = gnews * POINTS.gnews;
+      const pInvites = invites * POINTS.invites;
+      const pDismissals = dismissals * POINTS.dismissals;
+      const pLicenses = licenses * POINTS.licenses;
+      const total = pReports + pGnews + pInvites + pDismissals + pLicenses;
+
+      document.getElementById('totalPoints').textContent = total;
+
+      const parts = [];
+      if (pReports) parts.push(`Отч: ${pReports}`);
+      if (pGnews) parts.push(`GNews: ${pGnews}`);
+      if (pInvites) parts.push(`Пригл: ${pInvites}`);
+      if (pDismissals) parts.push(`Увал: ${pDismissals}`);
+      if (pLicenses) parts.push(`Лиц: ${pLicenses}`);
+      document.getElementById('pointsBreakdown').textContent = parts.join('  ·  ') || '—';
+    }
+
+    document.getElementById('rank').addEventListener('change', updateNorms);
+    ['reports','gnews','invites','dismissals','licenses'].forEach(id => {
+      document.getElementById(id).addEventListener('input', calculatePoints);
+    });
+
+    document.getElementById('reportForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const btn = document.getElementById('submitBtn');
+      const status = document.getElementById('status');
+
+      btn.disabled = true;
+      btn.textContent = "Отправляю...";
+      status.textContent = "";
+      status.className = "status";
+
+      const nickname = document.getElementById('nickname').value.trim();
+      const rankKey = document.getElementById('rank').value;
+      const rankName = RANK_NAMES[rankKey] || rankKey;
+
+      const reports = parseInt(document.getElementById('reports').value) || 0;
+      const gnews = parseInt(document.getElementById('gnews').value) || 0;
+      const invites = parseInt(document.getElementById('invites').value) || 0;
+      const dismissals = parseInt(document.getElementById('dismissals').value) || 0;
+      const licenses = parseInt(document.getElementById('licenses').value) || 0;
+
+      const reportsLinks = document.getElementById('reportsLinks').value.trim();
+      const gnewsLinks = document.getElementById('gnewsLinks').value.trim();
+      const invitesLinks = document.getElementById('invitesLinks').value.trim();
+      const dismissalsLinks = document.getElementById('dismissalsLinks').value.trim();
+      const licensesLinks = document.getElementById('licensesLinks').value.trim();
+      const notes = document.getElementById('notes').value.trim();
+
+      const total = reports*POINTS.reports + gnews*POINTS.gnews + invites*POINTS.invites +
+                   dismissals*POINTS.dismissals + licenses*POINTS.licenses;
+
+      const norms = NORMS[rankKey] || {};
+
+      const fields = [
+        { name: "👤 Ник", value: nickname, inline: true },
+        { name: "🎖️ Ранг", value: rankName, inline: true },
+        { name: "⭐ Баллы", value: `**${total}**`, inline: true }
+      ];
+
+      function addActivity(emoji, title, count, points, norm, links) {
+        let value = `**${count}** шт.  •  +${points} баллов`;
+        if (norm !== undefined) value += `  •  норма ${norm}`;
+        fields.push({ name: `${emoji} ${title}`, value: value, inline: false });
+        if (links) {
+          fields.push({ name: "└ Ссылки", value: links, inline: false });
+        }
+      }
+
+      addActivity("📄", "Отчёты на повышение", reports, reports*POINTS.reports, norms.reports, reportsLinks);
+      addActivity("📰", "Гос. волны (GNews)", gnews, gnews*POINTS.gnews, norms.gnews, gnewsLinks);
+      addActivity("🤝", "Приглашения", invites, invites*POINTS.invites, norms.invites, invitesLinks);
+      addActivity("🚪", "Увольнения", dismissals, dismissals*POINTS.dismissals, norms.dismissals, dismissalsLinks);
+      addActivity("🪪", "Выдача лицензий", licenses, licenses*POINTS.licenses, norms.licenses, licensesLinks);
+
+      if (notes) {
+        fields.push({ name: "📝 Заметки", value: notes, inline: false });
+      }
+
+      const embed = {
+        title: "📋 Ежедневный отчёт SAI",
+        color: 0x8b5cf6,
+        fields: fields,
+        timestamp: new Date().toISOString(),
+        footer: { text: "SAI Daily Report" }
+      };
+
+      try {
+        const response = await fetch(WEBHOOK_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username: "SAI Report Bot",
+            avatar_url: "https://cdn.discordapp.com/embed/avatars/0.png",
+            embeds: [embed]
+          })
+        });
+
+        if (response.ok) {
+          status.textContent = "✅ Отчёт успешно отправлен!";
+          status.className = "status success";
+        } else {
+          throw new Error(`Ошибка ${response.status}`);
+        }
+      } catch (err) {
+        status.textContent = "❌ Ошибка отправки. Проверь вебхук и интернет.";
+        status.className = "status error";
+        console.error(err);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Отправить отчёт";
+      }
+    });
+
+    calculatePoints();
+  </script>
+</body>
+</html>
